@@ -1,0 +1,3 @@
+#!/bin/bash
+
+npx rimraf dist pkg && npx webpack-dev-server --open -d
