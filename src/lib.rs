@@ -25,7 +25,12 @@ pub fn main_js() -> Result<(), JsValue> {
         .dyn_into::<web_sys::CanvasRenderingContext2d>()
         .unwrap();
 
-    draw_ierpinski_gasket(&context, [(300.0, 0.0), (0.0, 600.0), (600.0, 600.0)], 0, 3);
+    draw_ierpinski_gasket(
+        &context,
+        [(300.0, 0.0), (0.0, 600.0), (600.0, 600.0)],
+        220,
+        8,
+    );
     Ok(())
 }
 
