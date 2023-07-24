@@ -24,15 +24,27 @@ pub fn main_js() -> Result<(), JsValue> {
         .dyn_into::<web_sys::CanvasRenderingContext2d>()
         .unwrap();
 
-    draw_ierpinski_gasket(&context, 3);
+    draw_ierpinski_gasket(&context, [(300.0, 0.0), (0.0, 600.0), (600.0, 600.0)], 3);
     Ok(())
 }
 
-fn draw_ierpinski_gasket(context: &web_sys::CanvasRenderingContext2d, depth: u8) -> () {
-    draw_triangle(&context, [(300.0, 0.0), (0.0, 600.0), (600.0, 600.0)]);
-    draw_triangle(&context, [(300.0, 0.0), (150.00, 300.0), (450.0, 300.0)]);
-    draw_triangle(&context, [(150.0, 300.0), (0.0, 600.0), (300.0, 600.0)]);
-    draw_triangle(&context, [(450.0, 300.0), (300.0, 600.0), (600.0, 600.0)]);
+fn draw_ierpinski_gasket(
+    context: &web_sys::CanvasRenderingContext2d,
+    points: [(f64, f64); 3],
+    depth: u8,
+) -> () {
+    draw_triangle(&context, points);
+
+    let depth = depth - 1;
+    if depth > 0 {
+        let [top, left, right] = points;
+        let left_middle = ((top.0 + left.0) / 2.0, (top.1 + left.1) / 2.0);
+        let right_middle = ((top.0 + right.0) / 2.0, (top.1 + right.1) / 2.0);
+        let bottom_middle = (top.0, right.1);
+        draw_ierpinski_gasket(&context, [top, left_middle, right_middle], depth);
+        draw_ierpinski_gasket(&context, [left_middle, left, bottom_middle], depth);
+        draw_ierpinski_gasket(&context, [right_middle, bottom_middle, right], depth);
+    }
 }
 
 fn draw_triangle(context: &web_sys::CanvasRenderingContext2d, points: [(f64, f64); 3]) -> () {
