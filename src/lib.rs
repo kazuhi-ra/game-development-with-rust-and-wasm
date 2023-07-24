@@ -1,3 +1,4 @@
+use rand::prelude::*;
 use wasm_bindgen::prelude::*;
 use web_sys::console;
 
@@ -24,16 +25,17 @@ pub fn main_js() -> Result<(), JsValue> {
         .dyn_into::<web_sys::CanvasRenderingContext2d>()
         .unwrap();
 
-    draw_ierpinski_gasket(&context, [(300.0, 0.0), (0.0, 600.0), (600.0, 600.0)], 3);
+    draw_ierpinski_gasket(&context, [(300.0, 0.0), (0.0, 600.0), (600.0, 600.0)], 0, 3);
     Ok(())
 }
 
 fn draw_ierpinski_gasket(
     context: &web_sys::CanvasRenderingContext2d,
     points: [(f64, f64); 3],
+    color: u16,
     depth: u8,
 ) -> () {
-    draw_triangle(&context, points);
+    draw_triangle(&context, points, color);
 
     let depth = depth - 1;
     if depth > 0 {
@@ -41,14 +43,23 @@ fn draw_ierpinski_gasket(
         let left_middle = ((top.0 + left.0) / 2.0, (top.1 + left.1) / 2.0);
         let right_middle = ((top.0 + right.0) / 2.0, (top.1 + right.1) / 2.0);
         let bottom_middle = (top.0, right.1);
-        draw_ierpinski_gasket(&context, [top, left_middle, right_middle], depth);
-        draw_ierpinski_gasket(&context, [left_middle, left, bottom_middle], depth);
-        draw_ierpinski_gasket(&context, [right_middle, bottom_middle, right], depth);
+        let mut rng = thread_rng();
+        let color = rng.gen_range(0..360);
+        draw_ierpinski_gasket(&context, [top, left_middle, right_middle], color, depth);
+        draw_ierpinski_gasket(&context, [left_middle, left, bottom_middle], color, depth);
+        draw_ierpinski_gasket(&context, [right_middle, bottom_middle, right], color, depth);
     }
 }
 
-fn draw_triangle(context: &web_sys::CanvasRenderingContext2d, points: [(f64, f64); 3]) -> () {
+fn draw_triangle(
+    context: &web_sys::CanvasRenderingContext2d,
+    points: [(f64, f64); 3],
+    color: u16,
+) -> () {
     let [top, left, right] = points;
+    let color_str = format!("hsl({}, 100%, 50%)", color);
+    console::info_1(&JsValue::from_str(&color_str));
+    context.set_fill_style(&wasm_bindgen::JsValue::from_str(&color_str));
     context.move_to(top.0, top.1);
     context.begin_path();
     context.line_to(left.0, left.1);
@@ -56,4 +67,5 @@ fn draw_triangle(context: &web_sys::CanvasRenderingContext2d, points: [(f64, f64
     context.line_to(top.0, top.1);
     context.close_path();
     context.stroke();
+    context.fill();
 }
