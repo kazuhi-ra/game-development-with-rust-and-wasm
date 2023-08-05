@@ -25,7 +25,7 @@ pub fn main_js() -> Result<(), JsValue> {
         .dyn_into::<web_sys::CanvasRenderingContext2d>()
         .unwrap();
 
-    draw_ierpinski_gasket(
+    draw_sierpinski_gasket(
         &context,
         [(300.0, 0.0), (0.0, 600.0), (600.0, 600.0)],
         220,
@@ -34,7 +34,7 @@ pub fn main_js() -> Result<(), JsValue> {
     Ok(())
 }
 
-fn draw_ierpinski_gasket(
+fn draw_sierpinski_gasket(
     context: &web_sys::CanvasRenderingContext2d,
     points: [(f64, f64); 3],
     color: u16,
@@ -50,9 +50,9 @@ fn draw_ierpinski_gasket(
         let bottom_middle = (top.0, right.1);
         let mut rng = thread_rng();
         let color = rng.gen_range(0..360);
-        draw_ierpinski_gasket(&context, [top, left_middle, right_middle], color, depth);
-        draw_ierpinski_gasket(&context, [left_middle, left, bottom_middle], color, depth);
-        draw_ierpinski_gasket(&context, [right_middle, bottom_middle, right], color, depth);
+        draw_sierpinski_gasket(&context, [top, left_middle, right_middle], color, depth);
+        draw_sierpinski_gasket(&context, [left_middle, left, bottom_middle], color, depth);
+        draw_sierpinski_gasket(&context, [right_middle, bottom_middle, right], color, depth);
     }
 }
 
